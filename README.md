@@ -1,10 +1,10 @@
 # Statistics-with-SAS
-#One/Two sample t-tests for Ames Housing data set,Iowa
+# One/Two sample t-tests for Ames Housing data set,Iowa
 
 
 
-#Exploration of all variables that are available for analysis.#
-#%let statements define macro variables containing lists of dataset variables#
+# Exploration of all variables that are available for analysis.#
+# %let statements define macro variables containing lists of dataset variables#
 
 %let categorical=House_Style Overall_Qual Overall_Cond Year_Built 
          Fireplaces Mo_Sold Yr_Sold Garage_Type_2 Foundation_2 
@@ -17,7 +17,7 @@
          
          
         
-#PROC FREQ is used with categorical variables#
+# PROC FREQ is used with categorical variables#
 ods graphics;
 
 proc freq data=STAT1.ameshousing3;
@@ -34,9 +34,9 @@ run;
 
 
 
-#PROC UNIVARIATE provides summary statistics and plots for interval variables.#
-#The ODS statement specifies that only the histogram be displayed.#
-#The INSET statement requests summary statistics without having to print out tables.#
+# PROC UNIVARIATE provides summary statistics and plots for interval variables.#
+# The ODS statement specifies that only the histogram be displayed.#
+# The INSET statement requests summary statistics without having to print out tables.#
 
 ods select histogram;
 proc univariate data=STAT1.ameshousing3 noprint;
@@ -47,7 +47,7 @@ proc univariate data=STAT1.ameshousing3 noprint;
 run;
 
 
-#To perform a t-test using SAS#
+# To perform a 1-sample t-test using SAS#
 
 ods graphics;
 
@@ -56,11 +56,24 @@ proc ttest data = STAT1.ameshousing3
            H0 = 135000
      var = SalePrice;
      title "One Sample t-test testing whether mean SalePrice = $135000
+     
+# Two-Sample t-test Comparing Masonry Veneer, No vs. Yes"    
+ods graphics;
+
+proc ttest data=STAT1.ameshousing3 plots(shownull)=interval;
+    class Masonry_Veneer;
+    var SalePrice;
+    format Masonry_Veneer $NoYes.;
+    title "Two-Sample t-test Comparing Masonry Veneer, No vs. Yes";
+run;
+
+title;
 
 
-#Used to to box plots to see the association between the categorical predictor variables and the continuous response variable*/
 
-#PROC SGPLOT is used to explore relationships among categorical variables(X) and response variable(Y)*/
+# Used to to box plots to see the association between the categorical predictor variables and the continuous response variable*/
+
+# PROC SGPLOT is used to explore relationships among categorical variables(X) and response variable(Y)*/
 
 proc sgplot data=STAT1.ameshousing3;
     vbox SalePrice / category=Central_Air 
@@ -69,8 +82,8 @@ proc sgplot data=STAT1.ameshousing3;
 run;
 
 
-#PROC SGSCATTER is used to explore relationships among continuous variables#
-#using scatter plots#
+# PROC SGSCATTER is used to explore relationships among continuous variables#
+# using scatter plots#
 proc sgscatter data=STAT1.ameshousing3;
     plot SalePrice*Gr_Liv_Area / reg;
     title "Associations of Above Grade Living Area with Sale Price";
@@ -78,7 +91,7 @@ run;
 
 
 
-#To perform a one Way ANOVA model#
+# To perform a one Way ANOVA model#
 
 ods graphics;
 
@@ -94,7 +107,7 @@ quit;
 title;
 
 
-# 
+# To plot 
 proc sgplot data=STAT1.ameshousing3;
     vbox SalePrice / category=Central_Air 
                      connect=mean;
