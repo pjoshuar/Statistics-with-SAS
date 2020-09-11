@@ -90,6 +90,19 @@ proc sgscatter data=STAT1.ameshousing3;
 run;
 
 
+# To plot multiple scatter plots in the same plot then use the code as below
+%let interval=Gr_Liv_Area Basement_Area Garage_Area Deck_Porch_Area 
+         Lot_Area Age_Sold Bedroom_AbvGr Total_Bathroom;
+
+/*PROC SGSCATTER is used to explore relationships among continuous variables*/
+/*using scatter plots*/
+options nolabel;
+proc sgscatter data=STAT1.ameshousing3;
+    plot SalePrice*(&interval) / reg;
+    title "Associations of Interval Variables with Sale Price";
+run;
+
+
 
 # To perform a one Way ANOVA model#
 
@@ -97,8 +110,8 @@ ods graphics;
 
 proc glm data=STAT1.ameshousing3 plots=diagnostics;
     class Heating_QC;
-    model SalePrice=Heating_QC;
-    means Heating_QC / hovtest=levene;
+    model SalePrice=Heating_QC; # dependent and independent variables
+    means Heating_QC / hovtest=levene; #to use levene test to test for homogenity
     format Heating_QC $Heating_QC.;
     title "One-Way ANOVA with Heating Quality as Predictor";
 run;
@@ -106,12 +119,5 @@ quit;
 
 title;
 
-
-# To plot 
-proc sgplot data=STAT1.ameshousing3;
-    vbox SalePrice / category=Central_Air 
-                     connect=mean;
-    title "Sale Price Differences across Central Air";
-run;
 
 
