@@ -119,5 +119,51 @@ quit;
 
 title;
 
+# To do a pair-wise comparison to see which of means of the categories are not equal, we do a post-hoc analysis using Tukey & Dunnet plots and diffograms
+ods graphics;
+
+ods select lsmeans diff diffplot controlplot;
+proc glm data=STAT1.ameshousing3 
+         plots(only)=(diffplot(center) controlplot);
+    class Heating_QC;
+    model SalePrice=Heating_QC;
+    lsmeans Heating_QC / pdiff=all 
+                         adjust=tukey;
+    lsmeans Heating_QC / pdiff=control('Average/Typical') 
+                         adjust=dunnett;
+    format Heating_QC $Heating_QC.;
+    title "Post-Hoc Analysis of ANOVA - Heating Quality as Predictor";
+run;
+quit;
+
+title;
+
+# To check the correlation and the corresponding scatter plots
+%let interval=Gr_Liv_Area Basement_Area Garage_Area Deck_Porch_Area 
+         Lot_Area Age_Sold Bedroom_AbvGr Total_Bathroom;
+
+ods graphics / reset=all imagemap;
+proc corr data=STAT1.AmesHousing3 rank
+          plots(only)=scatter(nvar=all ellipse=none);
+   var &interval;
+   with SalePrice;
+   id PID;
+   title "Correlations and Scatter Plots with SalePrice";
+run;
+
+
+# A code to run a Simple Linear Regression
+ods graphics;
+
+proc reg data=STAT1.ameshousing3;
+    model SalePrice=Lot_Area;
+    title "Simple Regression with Lot Area as Regressor";
+run;
+quit;
+
+title;
+
+
+
 
 
