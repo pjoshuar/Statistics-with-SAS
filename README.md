@@ -379,3 +379,64 @@ proc glmselect data=STAT1.ameshousing3
    partition fraction(validate=0.3333);
    title "Selecting the Best Model using Honest Assessment";
 run;
+
+
+
+# Dealing with Categorical Variables
+title;
+proc format;
+    value bonusfmt 1 = "Bonus Eligible"
+                   0 = "Not Bonus Eligible"
+                  ;
+run;
+
+proc freq data=STAT1.ameshousing3;
+    tables Bonus Fireplaces Lot_Shape_2
+           Fireplaces*Bonus Lot_Shape_2*Bonus/ # Cross Tabulation between the variables
+           plots(only)=freqplot(scale=percent); # Plots the frequency plots of the variables
+    format Bonus bonusfmt.;
+run;
+
+proc univariate data=STAT1.ameshousing3 noprint;
+    class Bonus;
+    var Basement_Area ;
+    histogram Basement_Area;
+    inset mean std median min max / format=5.2 position=nw; # legend box displayed at the NorthWest Corner of the table
+    format Bonus bonusfmt.;
+run;
+
+
+# To check the association between two categorical variables using Chi Sqaure Test
+ods graphics off;
+proc freq data=STAT1.ameshousing3;
+    tables (Lot_Shape_2 Fireplaces)*Bonus
+          / chisq expected cellchi2 nocol nopercent 
+            relrisk;
+    format Bonus bonusfmt.;
+    title 'Associations with Bonus';
+run;
+
+ods graphics on;
+
+# To check the association between two ordinal categorical variables using "Mantel-Haenszel Chi-Square"
+/*st107d03.sas*/
+ods graphics off;
+proc freq data=STAT1.ameshousing3;
+    tables Fireplaces*Bonus / chisq measures cl;
+    format Bonus bonusfmt.;
+    title 'Ordinal Association between FIREPLACES and BONUS?';
+run;
+
+ods graphics on;
+
+
+# Multiple Logistic Regression
+ods graphics on;
+proc logistic data=STAT1.ameshousing3 plots(only)=(effect oddsratio);
+    class Fireplaces(ref='0') Lot_Shape_2(ref='Regular') / param=ref;
+    model Bonus(event='1')=Basement_Area Fireplaces Lot_Shape_2 / clodds=pl;
+    units Basement_Area=100;
+    title 'LOGISTIC MODEL (2):Bonus= Basement_Area Fireplaces Lot_Shape_2';
+run;
+
+
